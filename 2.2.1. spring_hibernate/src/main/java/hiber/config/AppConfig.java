@@ -16,15 +16,18 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import javax.sql.DataSource;
 import java.util.Properties;
 
-
 @Configuration
 @PropertySource("classpath:db.properties")
 @EnableTransactionManagement
 @ComponentScan(value = "hiber")
 public class AppConfig {
 
-   @Autowired
    private Environment env;
+
+   @Autowired
+   public void setEnvironment(Environment env) {
+      this.env = env;
+   }
 
    @Bean
    public DataSource getDataSource() {
@@ -37,11 +40,11 @@ public class AppConfig {
    }
 
    @Bean
-   public LocalSessionFactoryBean getSessionFactory() {
+   public LocalSessionFactoryBean getSessionFactory(DataSource dataSource) {
       LocalSessionFactoryBean factoryBean = new LocalSessionFactoryBean();
-      factoryBean.setDataSource(getDataSource());
-      
-      Properties props=new Properties();
+      factoryBean.setDataSource(dataSource);
+
+      Properties props = new Properties();
       props.put("hibernate.show_sql", env.getProperty("hibernate.show_sql"));
       props.put("hibernate.hbm2ddl.auto", env.getProperty("hibernate.hbm2ddl.auto"));
 
@@ -51,9 +54,9 @@ public class AppConfig {
    }
 
    @Bean
-   public HibernateTransactionManager getTransactionManager() {
+   public HibernateTransactionManager getTransactionManager(LocalSessionFactoryBean sessionFactory) {
       HibernateTransactionManager transactionManager = new HibernateTransactionManager();
-      transactionManager.setSessionFactory(getSessionFactory().getObject());
+      transactionManager.setSessionFactory(sessionFactory.getObject());
       return transactionManager;
    }
 }
