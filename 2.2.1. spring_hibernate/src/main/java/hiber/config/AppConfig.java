@@ -23,10 +23,22 @@ import java.util.Properties;
 public class AppConfig {
 
    private Environment env;
+   private DataSource dataSource;
+   private LocalSessionFactoryBean sessionFactory;
 
    @Autowired
    public void setEnvironment(Environment env) {
       this.env = env;
+   }
+
+   @Autowired
+   public void setDataSource(DataSource dataSource) {
+      this.dataSource = dataSource;
+   }
+
+   @Autowired
+   public void setSessionFactory(LocalSessionFactoryBean sessionFactory) {
+      this.sessionFactory = sessionFactory;
    }
 
    @Bean
@@ -40,7 +52,7 @@ public class AppConfig {
    }
 
    @Bean
-   public LocalSessionFactoryBean getSessionFactory(DataSource dataSource) {
+   public LocalSessionFactoryBean getSessionFactory() {
       LocalSessionFactoryBean factoryBean = new LocalSessionFactoryBean();
       factoryBean.setDataSource(dataSource);
 
@@ -54,9 +66,11 @@ public class AppConfig {
    }
 
    @Bean
-   public HibernateTransactionManager getTransactionManager(LocalSessionFactoryBean sessionFactory) {
+   public HibernateTransactionManager getTransactionManager() {
       HibernateTransactionManager transactionManager = new HibernateTransactionManager();
       transactionManager.setSessionFactory(sessionFactory.getObject());
       return transactionManager;
    }
 }
+
+
